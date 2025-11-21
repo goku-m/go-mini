@@ -22,6 +22,9 @@ type Contex struct {
 func NewApp() *App {
 	return &App{}
 }
+func InitCtx() *Contex {
+	return &Contex{}
+}
 
 func (a *App) listen(port string, callback string) {
 	fmt.Println(callback)
