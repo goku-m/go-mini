@@ -26,7 +26,7 @@ func InitCtx() *Contex {
 	return &Contex{}
 }
 
-func (a *App) listen(port string, callback string) {
+func (a *App) Listen(port string, callback string) {
 	fmt.Println(callback)
 
 	err := http.ListenAndServe(port, router)
@@ -35,7 +35,7 @@ func (a *App) listen(port string, callback string) {
 	}
 }
 
-func (a *App) use(middleware func(http.Handler) func(Response, Request)) {
+func (a *App) Use(middleware func(http.Handler) func(Response, Request)) {
 	middlewareList = append(middlewareList, middleware)
 }
 func chainMiddleware(handler func(Response, Request)) func(Response, Request) {
@@ -62,7 +62,7 @@ func chainMiddleware(handler func(Response, Request)) func(Response, Request) {
 	}
 }
 
-func (a *App) get(path string, handler func(Response, Request)) {
+func (a *App) Get(path string, handler func(Response, Request)) {
 	if len(middlewareList) != 0 {
 		router.HandleFunc("GET "+path, chainMiddleware(handler))
 	} else {
@@ -70,32 +70,32 @@ func (a *App) get(path string, handler func(Response, Request)) {
 	}
 }
 
-func (a *App) post(path string, handler func(Response, Request)) {
+func (a *App) Post(path string, handler func(Response, Request)) {
 	router.HandleFunc("POST "+path, chainMiddleware(handler))
 }
 
-func (a *App) put(path string, handler func(Response, Request)) {
+func (a *App) Put(path string, handler func(Response, Request)) {
 	router.HandleFunc("PUT "+path, chainMiddleware(handler))
 }
-func (a *App) delete(path string, handler func(Response, Request)) {
+func (a *App) Delete(path string, handler func(Response, Request)) {
 	router.HandleFunc("DELETE "+path, chainMiddleware(handler))
 }
 
 // Context Methods
-func (c *Contex) add(res Response, req Request) {
+func (c *Contex) Add(res Response, req Request) {
 	c.Request = req
 	c.Response = res
 }
 
-func (c *Contex) send(msg string) {
+func (c *Contex) Send(msg string) {
 	fmt.Fprint(c.Response, msg)
 }
 
-func (c *Contex) json(body map[string]string) {
+func (c *Contex) Json(body map[string]string) {
 	json.NewEncoder(c.Response).Encode(body)
 }
 
-func (c *Contex) body(value interface{}) {
+func (c *Contex) Body(value interface{}) {
 	err := json.NewDecoder(c.Request.Body).Decode(value)
 	if err != nil {
 		http.Error(c.Response, "Error Decoding Json", http.StatusBadRequest)
@@ -104,7 +104,7 @@ func (c *Contex) body(value interface{}) {
 	defer c.Request.Body.Close()
 }
 
-func (c *Contex) params(value string) string {
+func (c *Contex) Params(value string) string {
 	return c.Request.PathValue(value)
 }
 
